@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
-  <title>💜 Ana Paula</title>
+  <title>💜 Ana Paula Germano de Oliveira</title>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet"/>
 <style>
 :root {
@@ -95,9 +95,9 @@ body{
 }
 .intro-title{
   font-family:'Cormorant Garamond',serif;
-  font-size:clamp(4rem,18vw,7rem);
+  font-size:clamp(1.8rem,8vw,4rem);
   font-weight:300;line-height:0.95;
-  letter-spacing:-2px;
+  letter-spacing:-1px;
   animation: floatAnim 4s ease-in-out infinite;
 }
 .intro-title .t1{color:var(--p5);font-style:italic;display:block;}
@@ -111,8 +111,9 @@ body{
   content:attr(data-text);
   position:absolute;inset:0;
   font-family:'Cormorant Garamond',serif;
-  font-size:clamp(4rem,18vw,7rem);
-  font-weight:300;line-height:0.95;letter-spacing:-2px;
+  font-size:clamp(1.8rem,8vw,4rem);
+  font-weight:300;line-height:0.95;letter-spacing:-1px;
+  white-space:pre-line;
   pointer-events:none;opacity:0;
 }
 .intro-title-wrap::before{
@@ -508,10 +509,10 @@ body::after{
 ══════════════════════════════ -->
 <div id="page-intro" class="page active">
   <p class="intro-pre">uma mensagem especial para</p>
-  <div class="intro-title-wrap" data-text="Ana&#10;Paula">
+  <div class="intro-title-wrap" data-text="Ana Paula&#10;Germano de Oliveira">
     <h1 class="intro-title">
-      <span class="t1">Ana</span>
-      <span class="t2">Paula</span>
+      <span class="t1">Ana Paula</span>
+      <span class="t2">Germano de Oliveira</span>
     </h1>
   </div>
   <div class="intro-line"></div>
@@ -520,12 +521,12 @@ body::after{
     saiba que cada palavra aqui<br>veio do coração. 💜
   </p>
   <div class="intro-btn-wrap">
-    <button class="intro-btn" id="open-btn" onclick="transitionTo('page-question')">
+    <button class="intro-btn" id="open-btn">
       <div class="btn-glow"></div>
       <div class="btn-inner-ring"></div>
       💌
     </button>
-    <span class="intro-btn-label">toque para abrir</span>
+    <span class="intro-btn-label">pressione e segure para sentir meu coração</span>
   </div>
 </div>
 
@@ -536,11 +537,11 @@ body::after{
   <div class="q-chip reveal d1">✦ uma pergunta ✦</div>
   <p class="q-names reveal d2">Murilo &amp; Ana Paula</p>
   <h2 class="q-headline reveal d3">
-    Você quer ser<br>minha <em>namorada?</em>
+    Você aceita<br><em>namorar comigo?</em>
   </h2>
   <p class="q-sub reveal d4">
     Cada momento com você é inesquecível.<br>
-    Quero que seja oficial agora. 🌙
+    Quero que seja oficial agora.
   </p>
   <div class="btn-area reveal d5">
     <button class="btn-sim" onclick="goToYes()"><span>💜 Sim!</span></button>
@@ -558,7 +559,7 @@ body::after{
   <div class="yes-hero">
     <div class="yes-emoji">🎉</div>
     <h2 class="yes-title">Sim!!! 🤍</h2>
-    <p class="yes-sub">Você me faz tão feliz, Ana Paula!</p>
+    <p class="yes-sub">Eu te amo muito, para todo o sempre!</p>
   </div>
   <p class="yes-text">
     Agora somos oficiais. E eu prometo cuidar de você
@@ -874,11 +875,72 @@ function transitionTo2(id){
 }
 // override
 window.transitionTo = transitionTo2;
-// initial open btn
-document.getElementById('open-btn').onclick = ()=> transitionTo2('page-question');
+// HOLD TO UNLOCK
+let holdTimer = null;
+let holdProgress = 0;
+const openBtn = document.getElementById('open-btn');
+const btnGlow = openBtn.querySelector('.btn-glow');
+function startHold(e) {
+  if(e.type==='touchstart') { e.preventDefault(); }
+  holdProgress = 0;
+  function updateHold() {
+    holdProgress += 2;
+    btnGlow.style.transform = `scale(${1 + holdProgress/40})`;
+    btnGlow.style.opacity = Math.min(1, holdProgress/100 + 0.6);
+    if(holdProgress % 15 === 0 && navigator.vibrate) navigator.vibrate(30);
+    if(holdProgress >= 100) {
+      if(navigator.vibrate) navigator.vibrate([50,50,100]);
+      btnGlow.style.transform = 'scale(3)';
+      btnGlow.style.opacity = '0';
+      transitionTo2('page-question');
+    } else {
+      holdTimer = requestAnimationFrame(updateHold);
+    }
+  }
+  updateHold();
+}
+function stopHold() {
+  cancelAnimationFrame(holdTimer);
+  if(holdProgress >= 100) return;
+  holdProgress = 0;
+  btnGlow.style.transform = '';
+  btnGlow.style.opacity = '';
+}
+openBtn.addEventListener('mousedown', startHold);
+openBtn.addEventListener('touchstart', startHold);
+openBtn.addEventListener('mouseup', stopHold);
+openBtn.addEventListener('mouseleave', stopHold);
+openBtn.addEventListener('touchend', stopHold);
 
+// NO BUTTON SHATTER & EVASION
 function runAway(){
-  if(noEsc>=MAX) return; noEsc++;
+  if(noEsc>=MAX) return; 
+  noEsc++;
+  if(noEsc>=MAX) {
+    const r = btnNo.getBoundingClientRect();
+    for(let i=0; i<30; i++) {
+      const p = document.createElement('div');
+      p.style.cssText = `position:fixed; width:${Math.random()*8+4}px; height:${Math.random()*8+4}px; background:var(--pink); left:${r.left+r.width/2}px; top:${r.top+r.height/2}px; z-index:10000; pointer-events:none; border-radius:50%; box-shadow:0 0 10px var(--p4);`;
+      document.body.appendChild(p);
+      const vx = (Math.random()-0.5)*20;
+      let vy = (Math.random()-0.5)*20 - 5;
+      let px = r.left+r.width/2, py = r.top+r.height/2;
+      let a = 1;
+      function anim(){
+        px += vx; py += vy; vy += 0.5; a -= 0.02;
+        p.style.transform = `translate(${px - (r.left+r.width/2)}px, ${py - (r.top+r.height/2)}px)`;
+        p.style.opacity = a;
+        if(a>0) requestAnimationFrame(anim); else p.remove();
+      }
+      anim();
+    }
+    if(navigator.vibrate) navigator.vibrate([50, 50, 100]);
+    btnNo.style.display = 'none';
+    document.getElementById('btn-no-placeholder').classList.add('gone');
+    noAway.innerHTML = "Você achou mesmo que ia ter escolha? 😈💜";
+    noAway.classList.add('show');
+    return;
+  }
   const vw=innerWidth,vh=innerHeight;
   const bw=btnNo.offsetWidth||100,bh=btnNo.offsetHeight||50;
   const m=18;
@@ -888,14 +950,20 @@ function runAway(){
   do{ nx=m+Math.random()*(vw-bw-m*2); ny=m+Math.random()*(vh-bh-m*2); t++; }
   while(Math.abs(nx-cl)<80&&Math.abs(ny-ct)<80&&t<30);
   btnNo.style.left=nx+'px'; btnNo.style.top=ny+'px';
-  if(noEsc>=MAX) setTimeout(()=>{
-    btnNo.classList.add('bye');
-    document.getElementById('btn-no-placeholder').classList.add('gone');
-    noAway.classList.add('show');
-  }, 700);
 }
 btnNo.addEventListener('mouseover', runAway);
 function handleNoTouch(e){ e.preventDefault(); e.stopPropagation(); runAway(); }
+
+// GYROSCOPE PARALLAX
+window.addEventListener('deviceorientation', (e) => {
+  if (e.gamma === null || e.beta === null) return;
+  const ax = Math.max(-30, Math.min(30, e.gamma)) / 30; // -1 to 1
+  const ay = Math.max(-30, Math.min(30, e.beta - 45)) / 30; // -1 to 1
+  const pages = document.querySelectorAll('.page.active');
+  pages.forEach(p => {
+    p.style.transform = `perspective(1000px) rotateY(${ax * 5}deg) rotateX(${-ay * 5}deg) translateZ(10px)`;
+  });
+});
 
 /* ══════════════════════════════════════════════
    CONFETTI
